@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { Upload, CheckCircle, XCircle, AlertCircle, FileText, Download } from 'lucide-react';
+import { Upload, CheckCircle, XCircle, AlertCircle, FileText, Download, X } from 'lucide-react';
 
 interface ParsedTrade {
   ticker: string;
@@ -155,29 +155,95 @@ export default function CSVImport({ onClose, onImportSuccess }: CSVImportProps) 
   };
 
   return (
-    <div className="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 p-4">
-      <div className="bg-white rounded-lg shadow-xl max-w-4xl w-full max-h-[90vh] overflow-hidden flex flex-col">
+    <div
+      style={{
+        position: 'fixed',
+        inset: 0,
+        backgroundColor: 'rgba(0, 0, 0, 0.75)',
+        display: 'flex',
+        alignItems: 'center',
+        justifyContent: 'center',
+        zIndex: 9999,
+        padding: '20px'
+      }}
+      onClick={(e) => {
+        if (e.target === e.currentTarget) onClose();
+      }}
+    >
+      <div
+        style={{
+          backgroundColor: '#1c2128',
+          borderRadius: '12px',
+          maxWidth: '900px',
+          width: '100%',
+          maxHeight: '85vh',
+          display: 'flex',
+          flexDirection: 'column',
+          border: '1px solid #30363d',
+          overflow: 'hidden'
+        }}
+      >
         {/* Header */}
-        <div className="p-6 border-b border-gray-200">
-          <div className="flex justify-between items-start">
+        <div style={{
+          padding: '24px',
+          borderBottom: '1px solid #30363d',
+          backgroundColor: '#161b22'
+        }}>
+          <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'start' }}>
             <div>
-              <h2 className="text-2xl font-bold text-gray-900">Import Trades from CSV</h2>
-              <p className="text-sm text-gray-600 mt-1">
+              <h2 style={{ fontSize: '24px', fontWeight: '600', color: '#f0f6fc', marginBottom: '8px' }}>
+                Import Trades from CSV
+              </h2>
+              <p style={{ fontSize: '14px', color: '#8b949e' }}>
                 Upload your Robinhood CSV export to automatically import trades
               </p>
             </div>
             <button
               onClick={onClose}
-              className="text-gray-400 hover:text-gray-600 transition-colors"
+              style={{
+                background: 'none',
+                border: 'none',
+                color: '#8b949e',
+                cursor: 'pointer',
+                padding: '4px',
+                display: 'flex',
+                alignItems: 'center',
+                justifyContent: 'center',
+                borderRadius: '6px',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#30363d';
+                e.currentTarget.style.color = '#f0f6fc';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#8b949e';
+              }}
             >
-              <XCircle size={24} />
+              <X size={24} />
             </button>
           </div>
 
           {/* Sample download button */}
           <button
             onClick={downloadSample}
-            className="mt-4 flex items-center gap-2 text-sm text-blue-600 hover:text-blue-800 transition-colors"
+            style={{
+              marginTop: '16px',
+              display: 'flex',
+              alignItems: 'center',
+              gap: '8px',
+              fontSize: '14px',
+              color: '#58a6ff',
+              background: 'none',
+              border: 'none',
+              cursor: 'pointer',
+              padding: '8px 12px',
+              borderRadius: '6px',
+              transition: 'background 0.2s'
+            }}
+            onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#1f6feb20'}
+            onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
           >
             <Download size={16} />
             Download Sample CSV Format
@@ -185,36 +251,52 @@ export default function CSVImport({ onClose, onImportSuccess }: CSVImportProps) 
         </div>
 
         {/* Content */}
-        <div className="flex-1 overflow-y-auto p-6">
+        <div style={{ flex: 1, overflowY: 'auto', padding: '24px' }}>
           {/* Upload Area */}
           {!parseResult && !isUploading && (
             <div
               onDragOver={handleDragOver}
               onDragLeave={handleDragLeave}
               onDrop={handleDrop}
-              className={`border-2 border-dashed rounded-lg p-12 text-center transition-colors ${
-                isDragging
-                  ? 'border-blue-500 bg-blue-50'
-                  : 'border-gray-300 hover:border-gray-400'
-              }`}
+              style={{
+                border: `2px dashed ${isDragging ? '#58a6ff' : '#30363d'}`,
+                borderRadius: '12px',
+                padding: '60px 20px',
+                textAlign: 'center',
+                backgroundColor: isDragging ? '#1f6feb10' : '#0d1117',
+                transition: 'all 0.2s',
+                cursor: 'pointer'
+              }}
             >
-              <Upload className="mx-auto text-gray-400 mb-4" size={48} />
-              <h3 className="text-lg font-semibold text-gray-900 mb-2">
+              <Upload style={{ margin: '0 auto', color: '#8b949e', marginBottom: '16px' }} size={48} />
+              <h3 style={{ fontSize: '18px', fontWeight: '600', color: '#f0f6fc', marginBottom: '8px' }}>
                 Drop your Robinhood CSV here
               </h3>
-              <p className="text-sm text-gray-600 mb-4">
+              <p style={{ fontSize: '14px', color: '#8b949e', marginBottom: '16px' }}>
                 or click to browse your files
               </p>
               <input
                 type="file"
                 accept=".csv"
                 onChange={handleFileSelect}
-                className="hidden"
+                style={{ display: 'none' }}
                 id="csv-upload"
               />
               <label
                 htmlFor="csv-upload"
-                className="inline-block px-6 py-3 bg-blue-600 text-white rounded-lg hover:bg-blue-700 cursor-pointer transition-colors"
+                style={{
+                  display: 'inline-block',
+                  padding: '12px 24px',
+                  backgroundColor: '#238636',
+                  color: 'white',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontWeight: '500',
+                  fontSize: '14px',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#2ea043'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = '#238636'}
               >
                 Select CSV File
               </label>
@@ -223,68 +305,81 @@ export default function CSVImport({ onClose, onImportSuccess }: CSVImportProps) 
 
           {/* Loading State */}
           {isUploading && (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Parsing your CSV file...</p>
+            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                border: '3px solid #30363d',
+                borderTop: '3px solid #58a6ff',
+                borderRadius: '50%',
+                margin: '0 auto 16px',
+                animation: 'spin 1s linear infinite'
+              }} />
+              <p style={{ color: '#8b949e' }}>Parsing your CSV file...</p>
             </div>
           )}
 
           {/* Parse Results */}
           {parseResult && !isImporting && !importResult && (
-            <div className="space-y-6">
+            <div style={{ display: 'flex', flexDirection: 'column', gap: '20px' }}>
               {/* Summary */}
-              <div className="bg-gray-50 rounded-lg p-4">
-                <h3 className="font-semibold text-gray-900 mb-3">Parse Summary</h3>
-                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+              <div style={{
+                backgroundColor: '#0d1117',
+                borderRadius: '8px',
+                padding: '20px',
+                border: '1px solid #30363d'
+              }}>
+                <h3 style={{ fontWeight: '600', color: '#f0f6fc', marginBottom: '16px', fontSize: '16px' }}>
+                  Parse Summary
+                </h3>
+                <div style={{ display: 'grid', gridTemplateColumns: 'repeat(auto-fit, minmax(120px, 1fr))', gap: '16px' }}>
                   <div>
-                    <p className="text-sm text-gray-600">Total Rows</p>
-                    <p className="text-2xl font-bold text-gray-900">{parseResult.total_rows}</p>
+                    <p style={{ fontSize: '12px', color: '#8b949e', marginBottom: '4px' }}>Total Rows</p>
+                    <p style={{ fontSize: '24px', fontWeight: '700', color: '#f0f6fc' }}>{parseResult.total_rows}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Valid Trades</p>
-                    <p className="text-2xl font-bold text-green-600">{parseResult.valid_trades}</p>
+                    <p style={{ fontSize: '12px', color: '#8b949e', marginBottom: '4px' }}>Valid Trades</p>
+                    <p style={{ fontSize: '24px', fontWeight: '700', color: '#3fb950' }}>{parseResult.valid_trades}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Invalid</p>
-                    <p className="text-2xl font-bold text-red-600">{parseResult.invalid_trades}</p>
+                    <p style={{ fontSize: '12px', color: '#8b949e', marginBottom: '4px' }}>Invalid</p>
+                    <p style={{ fontSize: '24px', fontWeight: '700', color: '#f85149' }}>{parseResult.invalid_trades}</p>
                   </div>
                   <div>
-                    <p className="text-sm text-gray-600">Warnings</p>
-                    <p className="text-2xl font-bold text-yellow-600">{parseResult.warnings.length}</p>
+                    <p style={{ fontSize: '12px', color: '#8b949e', marginBottom: '4px' }}>Warnings</p>
+                    <p style={{ fontSize: '24px', fontWeight: '700', color: '#d29922' }}>{parseResult.warnings.length}</p>
                   </div>
                 </div>
               </div>
 
               {/* Errors */}
               {parseResult.errors.length > 0 && (
-                <div className="bg-red-50 border border-red-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-red-900 mb-2 flex items-center gap-2">
+                <div style={{
+                  backgroundColor: '#f8514920',
+                  border: '1px solid #f85149',
+                  borderRadius: '8px',
+                  padding: '16px'
+                }}>
+                  <h4 style={{
+                    fontWeight: '600',
+                    color: '#f85149',
+                    marginBottom: '12px',
+                    display: 'flex',
+                    alignItems: 'center',
+                    gap: '8px',
+                    fontSize: '14px'
+                  }}>
                     <AlertCircle size={18} />
                     Errors Found
                   </h4>
-                  <ul className="space-y-1 text-sm text-red-800">
+                  <ul style={{ margin: 0, paddingLeft: '20px', fontSize: '13px', color: '#ffa198' }}>
                     {parseResult.errors.slice(0, 5).map((err, idx) => (
-                      <li key={idx}>
+                      <li key={idx} style={{ marginBottom: '4px' }}>
                         Row {err.row}: {err.error}
                       </li>
                     ))}
                     {parseResult.errors.length > 5 && (
-                      <li className="text-red-600">...and {parseResult.errors.length - 5} more</li>
-                    )}
-                  </ul>
-                </div>
-              )}
-
-              {/* Warnings */}
-              {parseResult.warnings.length > 0 && (
-                <div className="bg-yellow-50 border border-yellow-200 rounded-lg p-4">
-                  <h4 className="font-semibold text-yellow-900 mb-2">Warnings</h4>
-                  <ul className="space-y-1 text-sm text-yellow-800">
-                    {parseResult.warnings.slice(0, 3).map((warning, idx) => (
-                      <li key={idx}>{warning}</li>
-                    ))}
-                    {parseResult.warnings.length > 3 && (
-                      <li className="text-yellow-600">...and {parseResult.warnings.length - 3} more</li>
+                      <li style={{ color: '#f85149' }}>...and {parseResult.errors.length - 5} more</li>
                     )}
                   </ul>
                 </div>
@@ -292,48 +387,76 @@ export default function CSVImport({ onClose, onImportSuccess }: CSVImportProps) 
 
               {/* Trade Preview */}
               <div>
-                <h4 className="font-semibold text-gray-900 mb-3">Trade Preview</h4>
-                <div className="overflow-x-auto">
-                  <table className="min-w-full divide-y divide-gray-200 text-sm">
-                    <thead className="bg-gray-50">
-                      <tr>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Status</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Ticker</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Type</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Strike</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Price</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Contracts</th>
-                        <th className="px-4 py-2 text-left text-xs font-medium text-gray-500 uppercase">Action</th>
+                <h4 style={{ fontWeight: '600', color: '#f0f6fc', marginBottom: '12px', fontSize: '14px' }}>
+                  Trade Preview
+                </h4>
+                <div style={{
+                  overflowX: 'auto',
+                  border: '1px solid #30363d',
+                  borderRadius: '8px',
+                  backgroundColor: '#0d1117'
+                }}>
+                  <table style={{
+                    width: '100%',
+                    fontSize: '13px',
+                    borderCollapse: 'collapse'
+                  }}>
+                    <thead>
+                      <tr style={{ backgroundColor: '#161b22', borderBottom: '1px solid #30363d' }}>
+                        <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8b949e' }}>Status</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8b949e' }}>Ticker</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8b949e' }}>Type</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8b949e' }}>Strike</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8b949e' }}>Price</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8b949e' }}>Contracts</th>
+                        <th style={{ padding: '12px', textAlign: 'left', fontSize: '12px', fontWeight: '600', color: '#8b949e' }}>Action</th>
                       </tr>
                     </thead>
-                    <tbody className="bg-white divide-y divide-gray-200">
+                    <tbody>
                       {parseResult.trades.slice(0, 10).map((trade, idx) => (
-                        <tr key={idx} className={!trade.is_valid ? 'bg-red-50' : ''}>
-                          <td className="px-4 py-2">
+                        <tr
+                          key={idx}
+                          style={{
+                            backgroundColor: !trade.is_valid ? '#f8514920' : 'transparent',
+                            borderBottom: '1px solid #30363d'
+                          }}
+                        >
+                          <td style={{ padding: '12px' }}>
                             {trade.is_valid ? (
-                              <CheckCircle size={16} className="text-green-600" />
+                              <CheckCircle size={16} style={{ color: '#3fb950' }} />
                             ) : (
-                              <XCircle size={16} className="text-red-600" />
+                              <XCircle size={16} style={{ color: '#f85149' }} />
                             )}
                           </td>
-                          <td className="px-4 py-2 font-medium">{trade.ticker}</td>
-                          <td className="px-4 py-2">
-                            <span className={`px-2 py-1 rounded text-xs ${
-                              trade.option_type === 'call' ? 'bg-green-100 text-green-800' : 'bg-red-100 text-red-800'
-                            }`}>
+                          <td style={{ padding: '12px', fontWeight: '500', color: '#f0f6fc' }}>{trade.ticker}</td>
+                          <td style={{ padding: '12px' }}>
+                            <span style={{
+                              padding: '4px 8px',
+                              borderRadius: '4px',
+                              fontSize: '11px',
+                              fontWeight: '600',
+                              backgroundColor: trade.option_type === 'call' ? '#3fb95020' : '#f8514920',
+                              color: trade.option_type === 'call' ? '#3fb950' : '#f85149'
+                            }}>
                               {trade.option_type.toUpperCase()}
                             </span>
                           </td>
-                          <td className="px-4 py-2">${trade.strike_price}</td>
-                          <td className="px-4 py-2">${trade.entry_price}</td>
-                          <td className="px-4 py-2">{trade.contracts}</td>
-                          <td className="px-4 py-2">{trade.trans_code}</td>
+                          <td style={{ padding: '12px', color: '#f0f6fc' }}>${trade.strike_price}</td>
+                          <td style={{ padding: '12px', color: '#f0f6fc' }}>${trade.entry_price}</td>
+                          <td style={{ padding: '12px', color: '#f0f6fc' }}>{trade.contracts}</td>
+                          <td style={{ padding: '12px', color: '#8b949e' }}>{trade.trans_code}</td>
                         </tr>
                       ))}
                     </tbody>
                   </table>
                   {parseResult.trades.length > 10 && (
-                    <p className="text-center text-sm text-gray-500 mt-2">
+                    <p style={{
+                      textAlign: 'center',
+                      fontSize: '12px',
+                      color: '#8b949e',
+                      padding: '12px',
+                      margin: 0
+                    }}>
                       Showing 10 of {parseResult.trades.length} trades
                     </p>
                   )}
@@ -344,22 +467,32 @@ export default function CSVImport({ onClose, onImportSuccess }: CSVImportProps) 
 
           {/* Importing State */}
           {isImporting && (
-            <div className="text-center py-12">
-              <div className="animate-spin rounded-full h-12 w-12 border-b-2 border-blue-600 mx-auto mb-4"></div>
-              <p className="text-gray-600">Importing trades to your journal...</p>
+            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <div style={{
+                width: '48px',
+                height: '48px',
+                border: '3px solid #30363d',
+                borderTop: '3px solid #58a6ff',
+                borderRadius: '50%',
+                margin: '0 auto 16px',
+                animation: 'spin 1s linear infinite'
+              }} />
+              <p style={{ color: '#8b949e' }}>Importing trades to your journal...</p>
             </div>
           )}
 
           {/* Import Success */}
           {importResult && (
-            <div className="text-center py-12">
-              <CheckCircle size={64} className="text-green-600 mx-auto mb-4" />
-              <h3 className="text-xl font-bold text-gray-900 mb-2">Import Successful!</h3>
-              <p className="text-gray-600">
+            <div style={{ textAlign: 'center', padding: '60px 20px' }}>
+              <CheckCircle size={64} style={{ color: '#3fb950', margin: '0 auto 16px' }} />
+              <h3 style={{ fontSize: '20px', fontWeight: '600', color: '#f0f6fc', marginBottom: '8px' }}>
+                Import Successful!
+              </h3>
+              <p style={{ color: '#8b949e' }}>
                 Successfully imported {importResult.imported} trades
               </p>
               {importResult.failed > 0 && (
-                <p className="text-red-600 mt-2">
+                <p style={{ color: '#f85149', marginTop: '8px' }}>
                   {importResult.failed} trades failed to import
                 </p>
               )}
@@ -369,27 +502,86 @@ export default function CSVImport({ onClose, onImportSuccess }: CSVImportProps) 
 
         {/* Footer */}
         {parseResult && !isImporting && !importResult && (
-          <div className="p-6 border-t border-gray-200 flex justify-between items-center">
+          <div style={{
+            padding: '20px 24px',
+            borderTop: '1px solid #30363d',
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
+            backgroundColor: '#161b22'
+          }}>
             <button
               onClick={() => {
                 setFile(null);
                 setParseResult(null);
               }}
-              className="px-4 py-2 text-gray-700 hover:text-gray-900 transition-colors"
+              style={{
+                padding: '8px 16px',
+                color: '#8b949e',
+                background: 'none',
+                border: 'none',
+                cursor: 'pointer',
+                fontSize: '14px',
+                borderRadius: '6px',
+                transition: 'all 0.2s'
+              }}
+              onMouseEnter={(e) => {
+                e.currentTarget.style.backgroundColor = '#30363d';
+                e.currentTarget.style.color = '#f0f6fc';
+              }}
+              onMouseLeave={(e) => {
+                e.currentTarget.style.backgroundColor = 'transparent';
+                e.currentTarget.style.color = '#8b949e';
+              }}
             >
               Upload Different File
             </button>
-            <div className="flex gap-3">
+            <div style={{ display: 'flex', gap: '12px' }}>
               <button
                 onClick={onClose}
-                className="px-6 py-2 border border-gray-300 text-gray-700 rounded-lg hover:bg-gray-50 transition-colors"
+                style={{
+                  padding: '10px 20px',
+                  border: '1px solid #30363d',
+                  color: '#f0f6fc',
+                  borderRadius: '6px',
+                  cursor: 'pointer',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  backgroundColor: 'transparent',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => e.currentTarget.style.backgroundColor = '#30363d'}
+                onMouseLeave={(e) => e.currentTarget.style.backgroundColor = 'transparent'}
               >
                 Cancel
               </button>
               <button
                 onClick={handleImport}
                 disabled={parseResult.valid_trades === 0}
-                className="px-6 py-2 bg-blue-600 text-white rounded-lg hover:bg-blue-700 disabled:bg-gray-300 disabled:cursor-not-allowed transition-colors flex items-center gap-2"
+                style={{
+                  padding: '10px 20px',
+                  backgroundColor: parseResult.valid_trades === 0 ? '#30363d' : '#238636',
+                  color: parseResult.valid_trades === 0 ? '#6e7681' : 'white',
+                  borderRadius: '6px',
+                  cursor: parseResult.valid_trades === 0 ? 'not-allowed' : 'pointer',
+                  border: 'none',
+                  fontSize: '14px',
+                  fontWeight: '500',
+                  display: 'flex',
+                  alignItems: 'center',
+                  gap: '8px',
+                  transition: 'background 0.2s'
+                }}
+                onMouseEnter={(e) => {
+                  if (parseResult.valid_trades > 0) {
+                    e.currentTarget.style.backgroundColor = '#2ea043';
+                  }
+                }}
+                onMouseLeave={(e) => {
+                  if (parseResult.valid_trades > 0) {
+                    e.currentTarget.style.backgroundColor = '#238636';
+                  }
+                }}
               >
                 <FileText size={18} />
                 Import {parseResult.valid_trades} Trades
@@ -398,6 +590,13 @@ export default function CSVImport({ onClose, onImportSuccess }: CSVImportProps) 
           </div>
         )}
       </div>
+
+      <style>{`
+        @keyframes spin {
+          from { transform: rotate(0deg); }
+          to { transform: rotate(360deg); }
+        }
+      `}</style>
     </div>
   );
 }
