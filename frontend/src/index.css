@@ -1,0 +1,934 @@
+/* Modern CSS for 0DTE Trading Journal */
+* {
+  box-sizing: border-box;
+  margin: 0;
+  padding: 0;
+}
+
+body {
+  background-color: #0f1419;
+  color: #e8e9ea;
+  font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', system-ui, sans-serif;
+  min-height: 100vh;
+  font-size: 14px;
+  line-height: 1.5;
+}
+
+/* Layout */
+.app-container {
+  display: flex;
+  min-height: 100vh;
+}
+
+.sidebar {
+  width: 240px;
+  background-color: #1a1d23;
+  border-right: 1px solid #2a2f36;
+  padding: 24px 0;
+  flex-shrink: 0;
+}
+
+.main-content {
+  flex: 1;
+  background-color: #0f1419;
+  overflow: auto;
+}
+
+.content-header {
+  padding: 24px 32px 0;
+  border-bottom: 1px solid #2a2f36;
+  background-color: #161b22;
+}
+
+.content-body {
+  padding: 24px 32px;
+}
+
+/* Sidebar */
+.sidebar-header {
+  padding: 0 24px 24px;
+  border-bottom: 1px solid #2a2f36;
+}
+
+.sidebar-logo {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f0f6fc;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.sidebar-nav {
+  padding: 24px 0;
+}
+
+.nav-item {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  padding: 8px 24px;
+  color: #8b949e;
+  text-decoration: none;
+  font-size: 14px;
+  font-weight: 500;
+  transition: all 0.2s;
+}
+
+.nav-item:hover {
+  background-color: #21262d;
+  color: #f0f6fc;
+}
+
+.nav-item.active {
+  background-color: #1f6feb;
+  color: white;
+}
+
+.nav-icon {
+  width: 16px;
+  height: 16px;
+  opacity: 0.7;
+}
+
+/* Cards */
+.card {
+  background-color: #161b22;
+  border: 1px solid #2a2f36;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.card-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 16px;
+}
+
+.card-title {
+  font-size: 16px;
+  font-weight: 600;
+  color: #f0f6fc;
+}
+
+.stats-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+  margin-bottom: 24px;
+}
+
+.stat-card {
+  background-color: #161b22;
+  border: 1px solid #2a2f36;
+  border-radius: 6px;
+  padding: 16px;
+}
+
+.stat-label {
+  font-size: 12px;
+  color: #8b949e;
+  text-transform: uppercase;
+  font-weight: 500;
+  margin-bottom: 4px;
+}
+
+.stat-value {
+  font-size: 24px;
+  font-weight: 600;
+  color: #f0f6fc;
+}
+
+.stat-change {
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.stat-positive {
+  color: #3fb950;
+}
+
+.stat-negative {
+  color: #f85149;
+}
+
+/* Buttons */
+.btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 6px 12px;
+  border-radius: 6px;
+  border: 1px solid transparent;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  text-decoration: none;
+}
+
+.btn-primary {
+  background-color: #1f6feb;
+  color: white;
+  border-color: #1f6feb;
+}
+
+.btn-primary:hover {
+  background-color: #1a5bd8;
+}
+
+.btn-secondary {
+  background-color: #21262d;
+  color: #f0f6fc;
+  border-color: #2a2f36;
+}
+
+.btn-secondary:hover {
+  background-color: #2c3138;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
+}
+
+/* Table */
+.table-container {
+  background-color: #161b22;
+  border: 1px solid #2a2f36;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.table {
+  width: 100%;
+  border-collapse: collapse;
+  font-size: 13px;
+}
+
+.table th {
+  background-color: #21262d;
+  padding: 12px 16px;
+  text-align: left;
+  font-weight: 600;
+  color: #f0f6fc;
+  border-bottom: 1px solid #2a2f36;
+  font-size: 11px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+.table td {
+  padding: 12px 16px;
+  border-bottom: 1px solid #30363d;
+  color: #e8e9ea;
+  vertical-align: middle;
+}
+
+.table tbody tr:hover {
+  background-color: #21262d;
+  transition: background-color 0.15s ease;
+}
+
+.table tbody tr:last-child td {
+  border-bottom: none;
+}
+
+/* Specific table column styling */
+.table .symbol-col {
+  font-weight: 600;
+  color: #f0f6fc;
+}
+
+.table .pnl-positive {
+  color: #3fb950;
+  font-weight: 600;
+}
+
+.table .pnl-negative {
+  color: #f85149;
+  font-weight: 600;
+}
+
+.table .pnl-neutral {
+  color: #8b949e;
+  font-weight: 500;
+}
+
+.table .return-positive {
+  color: #3fb950;
+  font-weight: 500;
+}
+
+.table .return-negative {
+  color: #f85149;
+  font-weight: 500;
+}
+
+.table .return-neutral {
+  color: #8b949e;
+  font-weight: 500;
+}
+
+/* Status badges */
+.status-badge {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 4px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.025em;
+  min-width: 50px;
+}
+
+.status-win {
+  background-color: #238636;
+  color: white;
+  border: 1px solid #2ea043;
+}
+
+.status-loss {
+  background-color: #da3633;
+  color: white;
+  border: 1px solid #f85149;
+}
+
+.status-open {
+  background-color: #bf8700;
+  color: white;
+  border: 1px solid #d4a72c;
+}
+
+/* Forms */
+.form-input {
+  width: 100%;
+  padding: 8px 12px;
+  background-color: #0d1117;
+  color: #f0f6fc;
+  border: 1px solid #2a2f36;
+  border-radius: 6px;
+  font-size: 14px;
+  transition: border-color 0.2s;
+}
+
+.form-input:focus {
+  outline: none;
+  border-color: #1f6feb;
+  box-shadow: 0 0 0 3px rgba(31, 111, 235, 0.1);
+}
+
+.form-label {
+  display: block;
+  font-size: 12px;
+  font-weight: 600;
+  color: #f0f6fc;
+  margin-bottom: 6px;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+}
+
+/* Symbol input styling */
+.symbol-input {
+  text-transform: uppercase;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+}
+
+/* Trade row hover actions */
+.trade-row {
+  position: relative;
+}
+
+.trade-row:hover .trade-actions {
+  opacity: 1;
+  visibility: visible;
+}
+
+.trade-actions {
+  position: absolute;
+  right: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.2s ease;
+  background-color: #21262d;
+  padding: 4px;
+  border-radius: 4px;
+  border: 1px solid #2a2f36;
+}
+
+.trade-action-btn {
+  padding: 4px 8px;
+  border: none;
+  border-radius: 3px;
+  cursor: pointer;
+  font-size: 12px;
+  font-weight: 500;
+  transition: all 0.15s ease;
+}
+
+.trade-action-btn.edit {
+  background-color: #1f6feb;
+  color: white;
+}
+
+.trade-action-btn.edit:hover {
+  background-color: #0969da;
+}
+
+.trade-action-btn.delete {
+  background-color: #da3633;
+  color: white;
+}
+
+.trade-action-btn.delete:hover {
+  background-color: #b62324;
+}
+
+/* Long/Short toggle button */
+.side-toggle {
+  width: 100%;
+  padding: 12px 20px;
+  border: none;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.05em;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+.side-toggle.long {
+  background-color: #238636;
+  color: white;
+}
+
+.side-toggle.long:hover {
+  background-color: #2ea043;
+  transform: translateY(-1px);
+}
+
+.side-toggle.short {
+  background-color: #da3633;
+  color: white;
+}
+
+.side-toggle.short:hover {
+  background-color: #f85149;
+  transform: translateY(-1px);
+}
+
+/* Modal */
+.modal-overlay {
+  position: fixed;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  background-color: rgba(0, 0, 0, 0.8);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  z-index: 1000;
+}
+
+.modal {
+  background-color: #161b22;
+  border: 1px solid #2a2f36;
+  border-radius: 6px;
+  padding: 24px;
+  max-width: 600px;
+  width: 90%;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 24px;
+}
+
+.modal-title {
+  font-size: 18px;
+  font-weight: 600;
+  color: #f0f6fc;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #8b949e;
+  font-size: 20px;
+  cursor: pointer;
+  padding: 4px;
+}
+
+.close-btn:hover {
+  color: #f0f6fc;
+}
+
+/* Calendar */
+.calendar-container {
+  background-color: #161b22;
+  border: 1px solid #2a2f36;
+  border-radius: 8px;
+  padding: 24px;
+  width: 100%;
+}
+
+.calendar-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 32px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #2a2f36;
+}
+
+.calendar-nav {
+  background: none;
+  border: none;
+  color: #8b949e;
+  font-size: 24px;
+  cursor: pointer;
+  padding: 8px 12px;
+  border-radius: 6px;
+  transition: all 0.2s;
+  min-width: 44px;
+  height: 44px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.calendar-nav:hover {
+  color: #f0f6fc;
+  background-color: #21262d;
+}
+
+.calendar-title {
+  font-size: 24px;
+  font-weight: 600;
+  color: #f0f6fc;
+  flex: 1;
+  text-align: center;
+}
+
+.calendar-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 1px;
+  background-color: #2a2f36;
+  border-radius: 6px;
+  overflow: hidden;
+}
+
+.calendar-weekday {
+  padding: 16px 8px;
+  text-align: center;
+  font-size: 13px;
+  font-weight: 600;
+  color: #8b949e;
+  text-transform: uppercase;
+  letter-spacing: 0.1em;
+  background-color: #21262d;
+}
+
+.calendar-day {
+  min-height: 120px;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-start;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s;
+  background-color: #161b22;
+  color: #e8e9ea;
+  padding: 12px;
+  position: relative;
+  border: none;
+}
+
+.calendar-day:hover {
+  background-color: #21262d;
+}
+
+.calendar-day-number {
+  font-size: 16px;
+  font-weight: 600;
+  margin-bottom: 8px;
+  color: #f0f6fc;
+}
+
+.calendar-day.profit {
+  background-color: #0d4427;
+  border-left: 4px solid #238636;
+}
+
+.calendar-day.profit .calendar-day-number {
+  color: #7ee787;
+}
+
+.calendar-day.loss {
+  background-color: #4c1e1e;
+  border-left: 4px solid #da3633;
+}
+
+.calendar-day.loss .calendar-day-number {
+  color: #ffa8a8;
+}
+
+.calendar-day.today {
+  background-color: #1a2332;
+  border-left: 4px solid #1f6feb;
+}
+
+.calendar-day.today .calendar-day-number {
+  color: #79c0ff;
+}
+
+.calendar-day.other-month {
+  color: #484f58;
+  background-color: #0d1117;
+}
+
+.calendar-day.other-month .calendar-day-number {
+  color: #484f58;
+}
+
+.calendar-day.neutral {
+  background-color: #161b22;
+}
+
+.calendar-pnl {
+  font-size: 12px;
+  font-weight: 600;
+  margin-top: auto;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background-color: rgba(255, 255, 255, 0.1);
+  min-width: 60px;
+  text-align: center;
+}
+
+.calendar-day.profit .calendar-pnl {
+  background-color: #238636;
+  color: white;
+}
+
+.calendar-day.loss .calendar-pnl {
+  background-color: #da3633;
+  color: white;
+}
+
+.calendar-trade-count {
+  font-size: 11px;
+  color: #8b949e;
+  margin-top: 4px;
+}
+
+.calendar-day-actions {
+  position: absolute;
+  top: 8px;
+  right: 8px;
+  display: flex;
+  gap: 4px;
+  opacity: 0;
+  transition: opacity 0.2s ease;
+  z-index: 10;
+}
+
+.calendar-day:hover .calendar-day-actions {
+  opacity: 1;
+}
+
+.calendar-action-btn {
+  width: 24px;
+  height: 24px;
+  border-radius: 4px;
+  border: none;
+  cursor: pointer;
+  font-size: 12px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  transition: all 0.15s ease;
+  background: rgba(0, 0, 0, 0.7);
+  color: #f0f6fc;
+}
+
+.calendar-action-btn:hover {
+  transform: scale(1.1);
+  background: rgba(0, 0, 0, 0.9);
+}
+
+.calendar-action-btn.add {
+  background: #238636;
+}
+
+.calendar-action-btn.add:hover {
+  background: #2ea043;
+}
+
+.calendar-action-btn.edit {
+  background: #1f6feb;
+}
+
+.calendar-action-btn.edit:hover {
+  background: #4184f3;
+}
+
+.calendar-action-btn.delete {
+  background: #da3633;
+}
+
+.calendar-action-btn.delete:hover {
+  background: #f85149;
+}
+
+/* Utilities */
+.grid {
+  display: grid;
+}
+
+.grid-cols-2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.gap-4 {
+  gap: 16px;
+}
+
+.flex {
+  display: flex;
+}
+
+.items-center {
+  align-items: center;
+}
+
+.justify-between {
+  justify-content: space-between;
+}
+
+.text-center {
+  text-align: center;
+}
+
+.mb-4 { margin-bottom: 16px; }
+.mb-6 { margin-bottom: 24px; }
+
+.text-sm { font-size: 12px; }
+.text-lg { font-size: 16px; }
+.text-xl { font-size: 18px; }
+
+.font-semibold { font-weight: 600; }
+
+/* Error styles */
+.error {
+  background-color: #da3633;
+  color: white;
+  padding: 12px 16px;
+  border-radius: 6px;
+  margin-bottom: 16px;
+  border: 1px solid #f85149;
+}
+
+/* Stats page styles */
+.stats-page {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.time-select {
+  padding: 6px 12px;
+  background-color: #21262d;
+  border: 1px solid #30363d;
+  border-radius: 6px;
+  color: #f0f6fc;
+  font-size: 14px;
+  cursor: pointer;
+}
+
+.time-select:focus {
+  outline: 2px solid #1f6feb;
+  border-color: #1f6feb;
+}
+
+.performance-summary .metrics-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
+  gap: 24px;
+  margin-top: 20px;
+}
+
+.metric-item {
+  text-align: center;
+}
+
+.metric-label {
+  color: #8b949e;
+  font-size: 12px;
+  font-weight: 500;
+  text-transform: uppercase;
+  letter-spacing: 0.5px;
+  margin-bottom: 8px;
+}
+
+.metric-value {
+  color: #f0f6fc;
+  font-size: 24px;
+  font-weight: 600;
+  line-height: 1.2;
+}
+
+.metric-value.positive {
+  color: #3fb950;
+}
+
+.metric-value.negative {
+  color: #f85149;
+}
+
+.metric-detail {
+  color: #8b949e;
+  font-size: 12px;
+  margin-top: 4px;
+}
+
+.trading-patterns {
+  display: flex;
+  gap: 24px;
+}
+
+@media (max-width: 768px) {
+  .trading-patterns {
+    flex-direction: column;
+  }
+}
+
+.day-performance-grid {
+  display: grid;
+  grid-template-columns: repeat(7, 1fr);
+  gap: 12px;
+  margin-top: 16px;
+}
+
+@media (max-width: 600px) {
+  .day-performance-grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+.day-performance-item {
+  background-color: #161b22;
+  border: 1px solid #30363d;
+  border-radius: 8px;
+  padding: 12px 8px;
+  text-align: center;
+  transition: all 0.2s;
+}
+
+.day-performance-item:hover {
+  background-color: #21262d;
+  border-color: #484f58;
+}
+
+.day-name {
+  color: #8b949e;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-bottom: 8px;
+}
+
+.day-trades {
+  color: #f0f6fc;
+  font-size: 12px;
+  margin-bottom: 4px;
+}
+
+.day-pnl {
+  font-size: 14px;
+  font-weight: 600;
+  margin-bottom: 4px;
+}
+
+.day-pnl.positive {
+  color: #3fb950;
+}
+
+.day-pnl.negative {
+  color: #f85149;
+}
+
+.day-winrate {
+  color: #8b949e;
+  font-size: 10px;
+}
+
+.quick-stats {
+  margin-top: 16px;
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+}
+
+.quick-stat {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 0;
+  border-bottom: 1px solid #21262d;
+}
+
+.quick-stat:last-child {
+  border-bottom: none;
+}
+
+.quick-stat-label {
+  color: #8b949e;
+  font-size: 12px;
+  font-weight: 500;
+}
+
+.quick-stat-value {
+  color: #f0f6fc;
+  font-size: 14px;
+  font-weight: 600;
+}
+
+.quick-stat-value.positive {
+  color: #3fb950;
+}
+
+.quick-stat-value.negative {
+  color: #f85149;
+}
+
+.symbol-breakdown {
+  margin-top: 8px;
+}
+
+/* Color utilities for stats */
+.positive {
+  color: #3fb950 !important;
+}
+
+.negative {
+  color: #f85149 !important;
+}
