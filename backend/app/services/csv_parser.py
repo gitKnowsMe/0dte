@@ -72,6 +72,12 @@ class RobinhoodCSVParser:
     """
 
     # Regex patterns for parsing option descriptions
+    # Robinhood format: "SPY Call $685 12/05/25"
+    ROBINHOOD_PATTERN = re.compile(
+        r'(Call|Put)\s+\$(\d+(?:\.\d+)?)\s+(\d{1,2}/\d{1,2}/\d{2,4})',
+        re.IGNORECASE
+    )
+
     OPTION_PATTERN_1 = re.compile(
         r'(\d+(?:\.\d+)?)\s+(Call|Put)\s+(\d{1,2}/\d{1,2}/\d{2,4})',
         re.IGNORECASE
@@ -184,14 +190,20 @@ class RobinhoodCSVParser:
             # Determine if this is entry or exit
             is_entry = trans_code in ['BUY', 'BTO', 'BOUGHT']
 
+            # For Robinhood: price is per contract, amount is total
+            # Calculate actual price per contract from amount if needed
+            actual_price = price
+            if actual_price == 0 and amount != 0 and quantity != 0:
+                actual_price = abs(amount) / (quantity * 100)
+
             return ParsedTrade(
                 ticker=ticker,
                 option_type=option_type.lower(),
                 strike_price=strike,
-                entry_price=price if is_entry else 0,
-                exit_price=price if not is_entry else None,
-                entry_time=activity_date if is_entry else datetime.now(),
-                exit_time=activity_date if not is_entry else None,
+                entry_price=actual_price if is_entry else 0,
+                exit_price=actual_price if not is_entry else None,
+                entry_time=activity_date,
+                exit_time=None,  # Will be set when we match BTO/STC pairs
                 contracts=quantity,
                 fees=0.0,  # Robinhood typically doesn't charge per-contract fees
                 expiration_date=exp_date,
@@ -221,10 +233,19 @@ class RobinhoodCSVParser:
         Parse option details from description field
 
         Examples:
+        - "SPY Call $685 12/05/25" -> (685, "Call", "12/05/25") [Robinhood format]
         - "100 Call 12/29/23" -> (100, "Call", "12/29/23")
         - ".SPX 12/29/23 Put $4545" -> (4545, "Put", "12/29/23")
         - "$100 C 12/29/23" -> (100, "Call", "12/29/23")
         """
+        # Try Robinhood pattern first: "SPY Call $685 12/05/25"
+        match = self.ROBINHOOD_PATTERN.search(description)
+        if match:
+            option_type = match.group(1).capitalize()
+            strike = float(match.group(2))
+            exp_date = match.group(3)
+            return strike, option_type, exp_date
+
         # Try pattern 1: "100 Call 12/29/23"
         match = self.OPTION_PATTERN_1.search(description)
         if match:
@@ -301,9 +322,51 @@ class RobinhoodCSVParser:
         """
         Group buy and sell transactions into complete trades
 
-        For now, return all trades as-is. Future enhancement:
-        Match BUY with SELL for the same strike/exp to create complete trades
+        Matches BTO (Buy to Open) with STC (Sell to Close) for the same option
         """
-        # TODO: Implement smart grouping of entry/exit
-        # For MVP, just return all parsed trades
-        return trades
+        grouped = []
+        bto_trades = {}  # Key: (ticker, strike, option_type, exp_date) -> trade
+
+        for trade in trades:
+            key = (trade.ticker, trade.strike_price, trade.option_type, trade.expiration_date)
+
+            if trade.trans_code in ['BTO', 'BUY', 'BOUGHT']:
+                # This is an opening trade - store it
+                bto_trades[key] = trade
+
+            elif trade.trans_code in ['STC', 'SELL', 'SOLD']:
+                # This is a closing trade - try to match with opening
+                if key in bto_trades:
+                    # Found matching BTO - create complete trade
+                    opening = bto_trades[key]
+                    complete_trade = ParsedTrade(
+                        ticker=opening.ticker,
+                        option_type=opening.option_type,
+                        strike_price=opening.strike_price,
+                        entry_price=opening.entry_price,
+                        exit_price=trade.exit_price,
+                        entry_time=opening.entry_time,
+                        exit_time=trade.entry_time,  # STC date is the exit time
+                        contracts=opening.contracts,
+                        fees=opening.fees,
+                        expiration_date=opening.expiration_date,
+                        trans_code='COMPLETE',
+                        amount=opening.amount + trade.amount,
+                        row_number=opening.row_number,
+                        is_valid=True,
+                        error_message=None
+                    )
+                    grouped.append(complete_trade)
+                    del bto_trades[key]
+                else:
+                    # No matching BTO - add as standalone sell
+                    grouped.append(trade)
+            else:
+                # Unknown transaction type
+                grouped.append(trade)
+
+        # Add any unmatched BTO trades (still open positions)
+        for opening_trade in bto_trades.values():
+            grouped.append(opening_trade)
+
+        return grouped
