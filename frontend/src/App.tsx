@@ -3,6 +3,7 @@ import TradeForm from './components/TradeForm'
 import Calendar from './components/Calendar'
 import TradesModal from './components/TradesModal'
 import Stats from './components/Stats'
+import CSVImport from './components/CSVImport'
 import { apiClient } from './api/client'
 
 interface Trade {
@@ -30,6 +31,7 @@ function App() {
   const [editingTrade, setEditingTrade] = useState<Trade | undefined>(undefined)
   const [showTradesModal, setShowTradesModal] = useState(false)
   const [selectedTradesDate, setSelectedTradesDate] = useState<string>('')
+  const [showCSVImport, setShowCSVImport] = useState(false)
   const [trades, setTrades] = useState<Trade[]>([])
   const [loading, setLoading] = useState(true)
   const [error, setError] = useState<string | null>(null)
@@ -226,12 +228,20 @@ function App() {
                   {currentView === 'stats' && 'Comprehensive trading analytics and performance metrics'}
                 </p>
               </div>
-              <button 
-                className="btn btn-primary"
-                onClick={() => setShowTradeForm(true)}
-              >
-                + New Trade
-              </button>
+              <div style={{ display: 'flex', gap: '12px' }}>
+                <button
+                  className="btn btn-secondary"
+                  onClick={() => setShowCSVImport(true)}
+                >
+                  📥 Import CSV
+                </button>
+                <button
+                  className="btn btn-primary"
+                  onClick={() => setShowTradeForm(true)}
+                >
+                  + New Trade
+                </button>
+              </div>
             </div>
           </div>
         </div>
@@ -506,6 +516,17 @@ function App() {
           onEditTrade={handleEditTradeFromModal}
           onDeleteTrade={handleDeleteTradeFromModal}
           onTradesUpdated={handleTradesUpdated}
+        />
+      )}
+
+      {/* CSV Import Modal */}
+      {showCSVImport && (
+        <CSVImport
+          onClose={() => setShowCSVImport(false)}
+          onImportSuccess={() => {
+            fetchTrades()
+            setRefreshTrigger(prev => prev + 1)
+          }}
         />
       )}
     </div>

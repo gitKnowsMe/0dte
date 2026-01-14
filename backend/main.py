@@ -1,6 +1,6 @@
 from fastapi import FastAPI
 from fastapi.middleware.cors import CORSMiddleware
-from app.routes import trades, daily_summaries
+from app.routes import trades, daily_summaries, import_csv
 from app.database import engine
 from app.models import Base
 
@@ -25,6 +25,7 @@ app.add_middleware(
 # Include routers
 app.include_router(trades.router, prefix="/api/trades", tags=["trades"])
 app.include_router(daily_summaries.router, prefix="/api/summaries", tags=["summaries"])
+app.include_router(import_csv.router, prefix="/api/import", tags=["import"])
 
 @app.get("/")
 async def root():
