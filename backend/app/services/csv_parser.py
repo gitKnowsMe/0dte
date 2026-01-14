@@ -129,9 +129,9 @@ class RobinhoodCSVParser:
 
                 if not parsed_trade.is_valid:
                     errors.append({
-                        "row": row_number,
+                        "row": str(row_number),
                         "ticker": parsed_trade.ticker,
-                        "error": parsed_trade.error_message
+                        "error": parsed_trade.error_message or "Unknown error"
                     })
 
             # Group trades (match buys with sells)
@@ -157,13 +157,13 @@ class RobinhoodCSVParser:
                 valid_trades=0,
                 invalid_trades=0,
                 trades=[],
-                errors=[{"row": 0, "error": f"Failed to parse CSV: {str(e)}"}]
+                errors=[{"row": "0", "ticker": "", "error": f"Failed to parse CSV: {str(e)}"}]
             )
 
     def _is_option_trade(self, row: Dict) -> bool:
         """Check if the row represents an option trade"""
-        description = row.get('Description', '').lower()
-        instrument = row.get('Instrument', '').lower()
+        description = (row.get('Description') or '').lower()
+        instrument = (row.get('Instrument') or '').lower()
 
         # Look for option keywords
         return any(keyword in description for keyword in ['call', 'put', 'option']) or \
@@ -285,19 +285,25 @@ class RobinhoodCSVParser:
         if not value:
             return 0.0
 
-        # Remove currency symbols, commas, and spaces
-        cleaned = value.replace('$', '').replace(',', '').replace(' ', '')
+        # Remove quotes, currency symbols, commas, and spaces
+        cleaned = str(value).strip().replace('"', '').replace('$', '').replace(',', '').replace(' ', '')
 
         # Handle parentheses for negative numbers
         if cleaned.startswith('(') and cleaned.endswith(')'):
             cleaned = '-' + cleaned[1:-1]
 
-        return float(cleaned)
+        try:
+            return float(cleaned)
+        except ValueError:
+            return 0.0
 
     def _parse_date(self, date_str: str) -> datetime:
         """Parse date string to datetime"""
         if not date_str:
             return datetime.now()
+
+        # Remove quotes if present
+        cleaned_date = str(date_str).strip().replace('"', '')
 
         # Try common date formats
         formats = [
@@ -311,7 +317,7 @@ class RobinhoodCSVParser:
 
         for fmt in formats:
             try:
-                return datetime.strptime(date_str.strip(), fmt)
+                return datetime.strptime(cleaned_date, fmt)
             except ValueError:
                 continue
 
@@ -323,21 +329,45 @@ class RobinhoodCSVParser:
         Group buy and sell transactions into complete trades
 
         Matches BTO (Buy to Open) with STC (Sell to Close) for the same option
+        Handles both orders: BTO before STC, or STC before BTO (reverse chronological)
         """
         grouped = []
-        bto_trades = {}  # Key: (ticker, strike, option_type, exp_date) -> trade
+        bto_trades = {}  # Key: (ticker, strike, option_type, exp_date, contracts) -> trade
+        stc_trades = {}  # Key: (ticker, strike, option_type, exp_date, contracts) -> trade
 
         for trade in trades:
-            key = (trade.ticker, trade.strike_price, trade.option_type, trade.expiration_date)
+            key = (trade.ticker, trade.strike_price, trade.option_type, trade.expiration_date, trade.contracts)
 
             if trade.trans_code in ['BTO', 'BUY', 'BOUGHT']:
-                # This is an opening trade - store it
-                bto_trades[key] = trade
+                # Check if we have a matching STC already (for reverse order CSVs)
+                if key in stc_trades:
+                    closing = stc_trades[key]
+                    complete_trade = ParsedTrade(
+                        ticker=trade.ticker,
+                        option_type=trade.option_type,
+                        strike_price=trade.strike_price,
+                        entry_price=trade.entry_price,
+                        exit_price=closing.exit_price,
+                        entry_time=trade.entry_time,
+                        exit_time=closing.entry_time,  # STC date is the exit time
+                        contracts=trade.contracts,
+                        fees=trade.fees,
+                        expiration_date=trade.expiration_date,
+                        trans_code='COMPLETE',
+                        amount=trade.amount + closing.amount,
+                        row_number=trade.row_number,
+                        is_valid=True,
+                        error_message=None
+                    )
+                    grouped.append(complete_trade)
+                    del stc_trades[key]
+                else:
+                    # Store BTO for later matching
+                    bto_trades[key] = trade
 
             elif trade.trans_code in ['STC', 'SELL', 'SOLD']:
-                # This is a closing trade - try to match with opening
+                # Check if we have a matching BTO already
                 if key in bto_trades:
-                    # Found matching BTO - create complete trade
                     opening = bto_trades[key]
                     complete_trade = ParsedTrade(
                         ticker=opening.ticker,
@@ -359,14 +389,16 @@ class RobinhoodCSVParser:
                     grouped.append(complete_trade)
                     del bto_trades[key]
                 else:
-                    # No matching BTO - add as standalone sell
-                    grouped.append(trade)
+                    # Store STC for later matching (reverse order case)
+                    stc_trades[key] = trade
             else:
                 # Unknown transaction type
                 grouped.append(trade)
 
-        # Add any unmatched BTO trades (still open positions)
+        # Add any unmatched trades (incomplete/open positions)
         for opening_trade in bto_trades.values():
             grouped.append(opening_trade)
+        for closing_trade in stc_trades.values():
+            grouped.append(closing_trade)
 
         return grouped
